@@ -1,0 +1,26 @@
+{
+	"name": "dsUsers",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "lsblobsuperstore",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": "Users",
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "consuperstore"
+			}
+		},
+		"schema": [
+			{
+				"type": "String"
+			},
+			{
+				"type": "String"
+			}
+		]
+	}
+}
