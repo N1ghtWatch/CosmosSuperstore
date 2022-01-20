@@ -1,0 +1,15 @@
+{
+	"name": "dscdbProfit",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "lscdbsuperstore",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "CosmosDbSqlApiCollection",
+		"schema": {},
+		"typeProperties": {
+			"collectionName": "Profit"
+		}
+	}
+}

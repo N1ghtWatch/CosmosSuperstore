@@ -1,0 +1,15 @@
+{
+	"name": "dscdbLoss",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "lscdbsuperstore",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "CosmosDbSqlApiCollection",
+		"schema": {},
+		"typeProperties": {
+			"collectionName": "loss"
+		}
+	}
+}
