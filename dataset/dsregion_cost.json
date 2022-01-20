@@ -18,9 +18,11 @@
 		},
 		"schema": [
 			{
+				"name": "Region",
 				"type": "String"
 			},
 			{
+				"name": "Cost",
 				"type": "String"
 			}
 		]

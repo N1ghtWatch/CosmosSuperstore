@@ -12,7 +12,8 @@
 			"location": {
 				"type": "AzureBlobStorageLocation",
 				"container": "consuperstore"
-			}
+			},
+			"firstRowAsHeader": true
 		},
 		"schema": [
 			{
