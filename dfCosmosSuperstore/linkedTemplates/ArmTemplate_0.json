@@ -1,0 +1,591 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "dfCosmosSuperstore"
+		},
+		"lsblobsuperstore_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'lsblobsuperstore'"
+		},
+		"lscdbsuperstore_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'lscdbsuperstore'"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/lsblobsuperstore')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('lsblobsuperstore_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/lscdbsuperstore')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "CosmosDb",
+				"typeProperties": {
+					"connectionString": "[parameters('lscdbsuperstore_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dsOrdersWeekly')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "lsblobsuperstore",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Excel",
+				"typeProperties": {
+					"sheetName": "Orders Weekly",
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "P1-SuperStoreUS-2015.xlsx",
+						"container": "consuperstore"
+					},
+					"firstRowAsHeader": true
+				},
+				"schema": [
+					{
+						"name": "Row ID",
+						"type": "String"
+					},
+					{
+						"name": "Order Priority",
+						"type": "String"
+					},
+					{
+						"name": "Discount",
+						"type": "String"
+					},
+					{
+						"name": "Unit Price",
+						"type": "String"
+					},
+					{
+						"name": "Shipping Cost",
+						"type": "String"
+					},
+					{
+						"name": "Customer ID",
+						"type": "String"
+					},
+					{
+						"name": "Customer Name",
+						"type": "String"
+					},
+					{
+						"name": "Ship Mode",
+						"type": "String"
+					},
+					{
+						"name": "Customer Segment",
+						"type": "String"
+					},
+					{
+						"name": "Product Category",
+						"type": "String"
+					},
+					{
+						"name": "Product Sub-Category",
+						"type": "String"
+					},
+					{
+						"name": "Product Container",
+						"type": "String"
+					},
+					{
+						"name": "Product Name",
+						"type": "String"
+					},
+					{
+						"name": "Product Base Margin",
+						"type": "String"
+					},
+					{
+						"name": "Country",
+						"type": "String"
+					},
+					{
+						"name": "Region",
+						"type": "String"
+					},
+					{
+						"name": "State or Province",
+						"type": "String"
+					},
+					{
+						"name": "City",
+						"type": "String"
+					},
+					{
+						"name": "Postal Code",
+						"type": "String"
+					},
+					{
+						"name": "Order Date",
+						"type": "String"
+					},
+					{
+						"name": "Ship Date",
+						"type": "String"
+					},
+					{
+						"name": "Profit",
+						"type": "String"
+					},
+					{
+						"name": "Quantity ordered new",
+						"type": "String"
+					},
+					{
+						"name": "Sales",
+						"type": "String"
+					},
+					{
+						"name": "Order ID",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/lsblobsuperstore')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dsUsers')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "lsblobsuperstore",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Excel",
+				"typeProperties": {
+					"sheetName": "Users",
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "P1-SuperStoreUS-2015.xlsx",
+						"container": "consuperstore"
+					},
+					"firstRowAsHeader": true
+				},
+				"schema": [
+					{
+						"name": "Region",
+						"type": "String"
+					},
+					{
+						"name": "Manager",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/lsblobsuperstore')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dscdbLoss')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "lscdbsuperstore",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "CosmosDbSqlApiCollection",
+				"schema": {},
+				"typeProperties": {
+					"collectionName": "loss"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/lscdbsuperstore')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dscdbProfit')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "lscdbsuperstore",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "CosmosDbSqlApiCollection",
+				"schema": {},
+				"typeProperties": {
+					"collectionName": "Profit"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/lscdbsuperstore')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dsorders')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "lsblobsuperstore",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Excel",
+				"typeProperties": {
+					"sheetName": "Orders",
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "P1-SuperStoreUS-2015.xlsx",
+						"container": "consuperstore"
+					},
+					"firstRowAsHeader": true
+				},
+				"schema": [
+					{
+						"name": "Row ID",
+						"type": "String"
+					},
+					{
+						"name": "Order Priority",
+						"type": "String"
+					},
+					{
+						"name": "Discount",
+						"type": "String"
+					},
+					{
+						"name": "Unit Price",
+						"type": "String"
+					},
+					{
+						"name": "Shipping Cost",
+						"type": "String"
+					},
+					{
+						"name": "Customer ID",
+						"type": "String"
+					},
+					{
+						"name": "Customer Name",
+						"type": "String"
+					},
+					{
+						"name": "Ship Mode",
+						"type": "String"
+					},
+					{
+						"name": "Customer Segment",
+						"type": "String"
+					},
+					{
+						"name": "Product Category",
+						"type": "String"
+					},
+					{
+						"name": "Product Sub-Category",
+						"type": "String"
+					},
+					{
+						"name": "Product Container",
+						"type": "String"
+					},
+					{
+						"name": "Product Name",
+						"type": "String"
+					},
+					{
+						"name": "Product Base Margin",
+						"type": "String"
+					},
+					{
+						"name": "Country",
+						"type": "String"
+					},
+					{
+						"name": "Region",
+						"type": "String"
+					},
+					{
+						"name": "State or Province",
+						"type": "String"
+					},
+					{
+						"name": "City",
+						"type": "String"
+					},
+					{
+						"name": "Postal Code",
+						"type": "String"
+					},
+					{
+						"name": "Order Date",
+						"type": "String"
+					},
+					{
+						"name": "Ship Date",
+						"type": "String"
+					},
+					{
+						"name": "Profit",
+						"type": "String"
+					},
+					{
+						"name": "Quantity ordered new",
+						"type": "String"
+					},
+					{
+						"name": "Sales",
+						"type": "String"
+					},
+					{
+						"name": "Order ID",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/lsblobsuperstore')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dsregion_cost')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "lsblobsuperstore",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Excel",
+				"typeProperties": {
+					"sheetName": "Region_Cost",
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "P1-SuperStoreUS-2015.xlsx",
+						"container": "consuperstore"
+					},
+					"firstRowAsHeader": true
+				},
+				"schema": [
+					{
+						"name": "Region",
+						"type": "String"
+					},
+					{
+						"name": "Cost",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/lsblobsuperstore')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dsreturns')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "lsblobsuperstore",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Excel",
+				"typeProperties": {
+					"sheetName": "Returns",
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "P1-SuperStoreUS-2015.xlsx",
+						"container": "consuperstore"
+					},
+					"firstRowAsHeader": true
+				},
+				"schema": [
+					{
+						"name": "Order ID",
+						"type": "String"
+					},
+					{
+						"name": "Status",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/lsblobsuperstore')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dfSuperstore')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "dsorders",
+								"type": "DatasetReference"
+							},
+							"name": "Orders"
+						},
+						{
+							"dataset": {
+								"referenceName": "dsOrdersWeekly",
+								"type": "DatasetReference"
+							},
+							"name": "OrdersWeekly"
+						},
+						{
+							"dataset": {
+								"referenceName": "dsregion_cost",
+								"type": "DatasetReference"
+							},
+							"name": "RegionCost"
+						},
+						{
+							"dataset": {
+								"referenceName": "dsreturns",
+								"type": "DatasetReference"
+							},
+							"name": "Returns"
+						},
+						{
+							"dataset": {
+								"referenceName": "dsUsers",
+								"type": "DatasetReference"
+							},
+							"name": "Users"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "dscdbProfit",
+								"type": "DatasetReference"
+							},
+							"name": "Profit"
+						},
+						{
+							"dataset": {
+								"referenceName": "dscdbLoss",
+								"type": "DatasetReference"
+							},
+							"name": "Loss"
+						}
+					],
+					"transformations": [
+						{
+							"name": "TotalSales"
+						},
+						{
+							"name": "SalesRegionCost"
+						},
+						{
+							"name": "SalesRCReturns"
+						},
+						{
+							"name": "FinalSales"
+						},
+						{
+							"name": "ConditionalSplit1"
+						}
+					],
+					"script": "source(output(\n\t\t{Row ID} as string,\n\t\t{Order Priority} as string,\n\t\tDiscount as string,\n\t\t{Unit Price} as string,\n\t\t{Shipping Cost} as string,\n\t\t{Customer ID} as string,\n\t\t{Customer Name} as string,\n\t\t{Ship Mode} as string,\n\t\t{Customer Segment} as string,\n\t\t{Product Category} as string,\n\t\t{Product Sub-Category} as string,\n\t\t{Product Container} as string,\n\t\t{Product Name} as string,\n\t\t{Product Base Margin} as string,\n\t\tCountry as string,\n\t\tRegion as string,\n\t\t{State or Province} as string,\n\t\tCity as string,\n\t\t{Postal Code} as string,\n\t\t{Order Date} as string,\n\t\t{Ship Date} as string,\n\t\tProfit as double,\n\t\t{Quantity ordered new} as string,\n\t\tSales as string,\n\t\t{Order ID} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> Orders\nsource(output(\n\t\t{Row ID} as string,\n\t\t{Order Priority} as string,\n\t\tDiscount as string,\n\t\t{Unit Price} as string,\n\t\t{Shipping Cost} as string,\n\t\t{Customer ID} as string,\n\t\t{Customer Name} as string,\n\t\t{Ship Mode} as string,\n\t\t{Customer Segment} as string,\n\t\t{Product Category} as string,\n\t\t{Product Sub-Category} as string,\n\t\t{Product Container} as string,\n\t\t{Product Name} as string,\n\t\t{Product Base Margin} as string,\n\t\tCountry as string,\n\t\tRegion as string,\n\t\t{State or Province} as string,\n\t\tCity as string,\n\t\t{Postal Code} as string,\n\t\t{Order Date} as string,\n\t\t{Ship Date} as string,\n\t\tProfit as double,\n\t\t{Quantity ordered new} as string,\n\t\tSales as string,\n\t\t{Order ID} as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> OrdersWeekly\nsource(output(\n\t\tRegion as string,\n\t\tCost as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> RegionCost\nsource(output(\n\t\t{Order ID} as string,\n\t\tStatus as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> Returns\nsource(output(\n\t\tRegion as string,\n\t\tManager as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> Users\nOrders, OrdersWeekly union(byName: true)~> TotalSales\nTotalSales, RegionCost join(TotalSales@Region == RegionCost@Region,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> SalesRegionCost\nSalesRegionCost, Returns join(TotalSales@{Order ID} == Returns@{Order ID},\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> SalesRCReturns\nSalesRCReturns, Users join(TotalSales@Region == Users@Region,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> FinalSales\nFinalSales split(Profit >= 0,\n\tdisjoint: false) ~> ConditionalSplit1@(Profit, Loss)\nConditionalSplit1@Profit sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'document',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Profit\nConditionalSplit1@Loss sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'document',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Loss"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/dsorders')]",
+				"[concat(variables('factoryId'), '/datasets/dsOrdersWeekly')]",
+				"[concat(variables('factoryId'), '/datasets/dsregion_cost')]",
+				"[concat(variables('factoryId'), '/datasets/dsreturns')]",
+				"[concat(variables('factoryId'), '/datasets/dsUsers')]",
+				"[concat(variables('factoryId'), '/datasets/dscdbProfit')]",
+				"[concat(variables('factoryId'), '/datasets/dscdbLoss')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "SuperstoretoCosmosDB",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "1.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "dfSuperstore",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"Orders": {},
+									"OrdersWeekly": {},
+									"RegionCost": {},
+									"Returns": {},
+									"Users": {},
+									"Profit": {},
+									"Loss": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/dfSuperstore')]"
+			]
+		}
+	]
+}
